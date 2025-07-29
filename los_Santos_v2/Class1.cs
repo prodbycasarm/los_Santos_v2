@@ -458,10 +458,10 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "shopui_title_carmod", 
+                "shopui_title_carmod",
                 "shopui_title_carmod"
             )
-        ); 
+        );
         pool.Add(upgradeMenu);
 
         // Repair Car
@@ -1109,7 +1109,7 @@ public class losSantosV2 : Script
         };
 
 
-        
+
 
         // 1. Get current vehicle and available armor levels
         Vehicle currentVehicle = Game.Player.Character.CurrentVehicle;
@@ -1145,26 +1145,26 @@ public class losSantosV2 : Script
         foreach (var level in armorModLevels)
         {
 
-                var armorItem = new NativeItem($"{level.Value} - ${armorPrices[level.Key]}");
-                originalArmorTitles[armorItem] = armorItem.Title;
+            var armorItem = new NativeItem($"{level.Value} - ${armorPrices[level.Key]}");
+            originalArmorTitles[armorItem] = armorItem.Title;
 
-                armorItem.Activated += (sender, args) =>
+            armorItem.Activated += (sender, args) =>
+            {
+                ApplyArmorUpgrade(level.Key);
+                armorItem.Title = "Installed";
+
+                // Reset all others
+                foreach (var item in armorItems)
                 {
-                    ApplyArmorUpgrade(level.Key);
-                    armorItem.Title = "Installed";
-
-                    // Reset all others
-                    foreach (var item in armorItems)
+                    if (item != armorItem)
                     {
-                        if (item != armorItem)
-                        {
-                            item.Title = originalArmorTitles[item];
-                        }
+                        item.Title = originalArmorTitles[item];
                     }
-                };
+                }
+            };
 
-                armorItems.Add(armorItem);
-                armorSubMenu.Add(armorItem);
+            armorItems.Add(armorItem);
+            armorSubMenu.Add(armorItem);
 
         }
 
@@ -1542,7 +1542,7 @@ public class losSantosV2 : Script
         // Loop to add submenu per category
         // Global variables for preview cache
         // These should be declared at class level
-    
+
 
 
         foreach (var category in wheelCategories)
@@ -1746,7 +1746,7 @@ public class losSantosV2 : Script
                 // Show a message telling the player they must be in a vehicle to access the workshop
                 if (notificationHandle == -1)
                 {
-                  
+
                 }
             }
         }
@@ -1777,7 +1777,7 @@ public class losSantosV2 : Script
         }
         else
         {
-           
+
         }
     }
     // Blip Stuff
@@ -2464,7 +2464,7 @@ public class losSantosV2 : Script
         Console.WriteLine($"Engine Torque Multiplier for Transmission Level {level}: {torqueMultiplier}");
     }
 
- 
+
     Dictionary<int, int> currentWheelIndex = new Dictionary<int, int>();
 
 
