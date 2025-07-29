@@ -27,14 +27,9 @@ public class losSantosV2 : Script
     private NativeMenu upgradeMenu;
     private NativeMenu paintSubMenu;
     private NativeMenu addNeonSubMenu;
-    private NativeMenu primaryColorSubMenu;
     private NativeMenu tintColorSubMenu;
     private NativeMenu headlightColorSubMenu;
-    private NativeMenu wheelColorSubMenu;
-    private NativeMenu interiorColorSubMenu;
     private NativeMenu neonColorSubMenu;
-    private NativeMenu dialColorSubMenu;
-    private NativeMenu secondaryColorSubMenu;
     private NativeMenu engineSubMenu;
     private NativeMenu armorSubMenu;
     private NativeMenu headlightSubMenu;
@@ -463,10 +458,10 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos", // <<  custom .ytd name (without .ytd extension)
-                "shoplogo"           // << texture name inside the YTD 
+                "shopui_title_carmod", 
+                "shopui_title_carmod"
             )
-        );
+        ); 
         pool.Add(upgradeMenu);
 
         // Repair Car
@@ -483,8 +478,8 @@ public class losSantosV2 : Script
         new ScaledTexture(
             PointF.Empty,
             new SizeF(431, 107),
-            "morelossantos",
-            "shoplogo"
+            "shopui_title_carmod",
+            "shopui_title_carmod"
         )
         );
 
@@ -602,337 +597,6 @@ public class losSantosV2 : Script
 
 
 
-        paintSubMenu = new NativeMenu(
-        "",
-        "Paint & Colors",
-        "",
-        new ScaledTexture(
-            PointF.Empty,
-            new SizeF(431, 107),
-            "morelossantos",
-            "shoplogo"
-        )
-        );
-        pool.Add(paintSubMenu);
-        var paintSubMenuItem = upgradeMenu.AddSubMenu(paintSubMenu);
-
-
-        // Primary and Secondary Color Main Submenu
-        NativeMenu primaryColorMenu = new NativeMenu(
-            "",
-            "Primary Color",
-            "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            )
-        );
-
-        NativeMenu secondaryColorMenu = new NativeMenu(
-            "",
-            "Secondary Color",
-            "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            )
-        );
-
-        NativeMenu interiorColorMenu = new NativeMenu(
-            "",
-            "Interior Color",
-            "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            )
-        );
-
-        NativeMenu wheelColorMenu = new NativeMenu(
-            "",
-            "Wheel Color",
-            "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            )
-        );
-
-        NativeMenu dialsColorMenu = new NativeMenu(
-            "",
-            "Dials Color",
-            "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            )
-        );
-
-
-        pool.Add(primaryColorMenu);
-        pool.Add(secondaryColorMenu);
-        pool.Add(interiorColorMenu);
-        pool.Add(wheelColorMenu);
-        pool.Add(dialsColorMenu);
-
-        paintSubMenu.AddSubMenu(primaryColorMenu);
-        paintSubMenu.AddSubMenu(secondaryColorMenu);
-        paintSubMenu.AddSubMenu(interiorColorMenu);
-        paintSubMenu.AddSubMenu(wheelColorMenu);
-        paintSubMenu.AddSubMenu(dialsColorMenu);
-
-        // Setup Menus
-        SetupColorCategories(primaryColorMenu, ColorType.Primary);
-        SetupColorCategories(secondaryColorMenu, ColorType.Secondary);
-        SetupColorCategories(interiorColorMenu, ColorType.Interior);
-        SetupColorCategories(wheelColorMenu, ColorType.Wheel);
-        SetupColorCategories(dialsColorMenu, ColorType.Dials);
-
-
-
-
-
-        // Tint Color Submenu
-        tintColorSubMenu = new NativeMenu("", "Tint Colors", "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            ));
-        pool.Add(tintColorSubMenu);
-        paintSubMenu.AddSubMenu(tintColorSubMenu);
-        tintColorSubMenu.Shown += (sender, args) =>
-        {
-            tintColorSubMenu.Clear();
-
-            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
-            if (vehicle == null || !vehicle.Exists())
-            {
-                GTA.UI.Notification.Show("~r~You must be in a vehicle to view tint colors.");
-                return;
-            }
-
-            for (int i = 0; i < tintlightColors.Count; i++)
-            {
-                int tintIndex = i;
-                string tintName = tintlightColors[i];
-
-                var tintItem = new NativeItem(tintName);
-                tintItem.Activated += (s, e) =>
-                {
-                    Function.Call(Hash.SET_VEHICLE_WINDOW_TINT, vehicle, tintIndex);
-                };
-
-                tintColorSubMenu.Add(tintItem);
-            }
-        };
-
-        // Headlight Color Submenu
-        headlightColorSubMenu = new NativeMenu("", "Xenon Headlight Colors", "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            ));
-        pool.Add(headlightColorSubMenu);
-        paintSubMenu.AddSubMenu(headlightColorSubMenu);
-
-        headlightColorSubMenu.Shown += (sender, args) =>
-        {
-            headlightColorSubMenu.Clear();
-
-            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
-            if (vehicle == null || !vehicle.Exists())
-            {
-                GTA.UI.Notification.Show("~r~You must be in a vehicle to view headlight colors.");
-                return;
-            }
-
-            // Check if Xenon headlights are enabled
-            bool xenonEnabled = Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, vehicle, 22);
-            if (!xenonEnabled)
-            {
-                GTA.UI.Notification.Show("~r~Install Xenon headlights first to use headlight colors!");
-                return;
-            }
-
-            // Load color options
-            for (int i = 0; i < headlightColors.Count; i++)
-            {
-                int colorIndex = i;
-                string colorName = headlightColors[i];
-
-                var headlightItem = new NativeItem(colorName);
-                headlightItem.Activated += (s, e) =>
-                {
-                    Function.Call(Hash.SET_VEHICLE_XENON_LIGHT_COLOR_INDEX, vehicle, colorIndex);
-                };
-
-                headlightColorSubMenu.Add(headlightItem);
-            }
-        };
-
-        // Neon Color Submenu
-        neonColorSubMenu = new NativeMenu("", "Neon Light Color", "",
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
-            ));
-        pool.Add(neonColorSubMenu);
-        var neonSubMenuItem = paintSubMenu.AddSubMenu(neonColorSubMenu);
-
-        // Define the neon colors (with the colors you want)
-        Color[] colors = new Color[]
-        {
-    Color.AliceBlue, Color.AntiqueWhite, Color.Aqua, Color.Aquamarine, Color.Azure, Color.Beige,
-    Color.Bisque, Color.BlanchedAlmond, Color.Blue, Color.BlueViolet, Color.Brown,
-    Color.BurlyWood, Color.CadetBlue, Color.Chartreuse, Color.Chocolate, Color.Coral, Color.CornflowerBlue,
-    Color.Cornsilk, Color.Crimson, Color.Cyan, Color.DarkBlue, Color.DarkCyan, Color.DarkGoldenrod,
-    Color.DarkGray, Color.DarkGreen, Color.DarkKhaki, Color.DarkMagenta, Color.DarkOliveGreen, Color.DarkOrange,
-    Color.DarkOrchid, Color.DarkRed, Color.DarkSalmon, Color.DarkSeaGreen, Color.DarkSlateBlue, Color.DarkSlateGray,
-    Color.DarkTurquoise, Color.DarkViolet, Color.DeepPink, Color.DeepSkyBlue, Color.DimGray, Color.DodgerBlue,
-    Color.Firebrick, Color.FloralWhite, Color.ForestGreen, Color.Fuchsia, Color.Gainsboro, Color.GhostWhite,
-    Color.Gold, Color.Goldenrod, Color.Gray, Color.Green, Color.GreenYellow, Color.Honeydew, Color.HotPink,
-    Color.IndianRed, Color.Indigo, Color.Ivory, Color.Khaki, Color.Lavender, Color.LavenderBlush, Color.LawnGreen,
-    Color.LemonChiffon, Color.LightBlue, Color.LightCoral, Color.LightCyan, Color.LightGoldenrodYellow, Color.LightGray,
-    Color.LightGreen, Color.LightPink, Color.LightSalmon, Color.LightSeaGreen, Color.LightSkyBlue, Color.LightSlateGray,
-    Color.LightSteelBlue, Color.LightYellow, Color.Lime, Color.LimeGreen, Color.Linen, Color.Magenta, Color.Maroon,
-    Color.MediumAquamarine, Color.MediumBlue, Color.MediumOrchid, Color.MediumPurple, Color.MediumSeaGreen,
-    Color.MediumSlateBlue, Color.MediumSpringGreen, Color.MediumTurquoise, Color.MediumVioletRed, Color.MidnightBlue,
-    Color.MintCream, Color.MistyRose, Color.Moccasin, Color.NavajoWhite, Color.Navy, Color.OldLace, Color.Olive,
-    Color.OliveDrab, Color.Orange, Color.OrangeRed, Color.Orchid, Color.PaleGoldenrod, Color.PaleGreen, Color.PaleTurquoise,
-    Color.PaleVioletRed, Color.PapayaWhip, Color.PeachPuff, Color.Peru, Color.Pink, Color.Plum, Color.PowderBlue,
-    Color.Purple, Color.Red, Color.RosyBrown, Color.RoyalBlue, Color.SaddleBrown, Color.Salmon,
-    Color.SandyBrown, Color.SeaGreen, Color.SeaShell, Color.Sienna, Color.Silver, Color.SkyBlue, Color.SlateBlue,
-    Color.SlateGray, Color.Snow, Color.SpringGreen, Color.SteelBlue, Color.Tan, Color.Teal, Color.Thistle, Color.Tomato,
-    Color.Transparent, Color.Turquoise, Color.Violet, Color.Wheat, Color.White, Color.WhiteSmoke, Color.Yellow,
-    Color.YellowGreen
-        };
-
-        // Show neon color items when opening submenu
-        neonColorSubMenu.Shown += (sender, args) =>
-        {
-            neonColorSubMenu.Clear();
-
-            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
-            if (vehicle == null || !vehicle.Exists())
-            {
-                GTA.UI.Notification.Show("~r~You must be in a vehicle to use neon colors.");
-                return;
-            }
-
-            // Check if neon lights are enabled on at least one side
-            bool hasNeons = false;
-            for (int i = 0; i < 4; i++) // 0 = left, 1 = right, 2 = front, 3 = back
-            {
-                if (Function.Call<bool>(Hash.GET_VEHICLE_NEON_ENABLED, vehicle, i))
-                {
-                    hasNeons = true;
-                    break;
-                }
-            }
-
-            if (!hasNeons)
-            {
-                GTA.UI.Notification.Show("~r~Install and enable neon lights first!");
-                return;
-            }
-
-            // Add items for each defined color
-            for (int i = 0; i < colors.Length; i++)
-            {
-                int colorIndex = i;
-                Color color = colors[i];
-                string colorName = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(color.Name.Replace('_', ' '));
-
-                var neonItem = new NativeItem(colorName);
-                neonItem.Activated += (s, e) =>
-                {
-                    Function.Call(Hash.SET_VEHICLE_NEON_COLOUR, vehicle, color.R, color.G, color.B);
-                };
-
-                neonColorSubMenu.Add(neonItem);
-            }
-        };
-
-
-
-        turboSubMenu = new NativeMenu(
-            "", // Title (empty or optional)
-            "Turbo", // Subtitle
-            "", // ID or name
-            new ScaledTexture(
-                PointF.Empty,
-                new SizeF(431, 107),
-                "morelossantos", // GTA V workshop banner
-                "shoplogo"
-            )
-        );
-        pool.Add(turboSubMenu);
-        var turboSubMenuItem = upgradeMenu.AddSubMenu(turboSubMenu);
-
-        // Turbo mod options
-        var turboModLevels = new Dictionary<int, string>
-        {
-            { 1, "Install Turbo - 5000$" },
-            { 2, "Remove Turbo - 500$" }
-        };
-
-        // Loop to create the items
-
-
-        foreach (var level in turboModLevels)
-        {
-            var turboItem = new NativeItem(level.Value);
-            turboItem.Activated += (sender, args) => ToggleTurbo(level.Key, turboItem);
-            turboSubMenu.Add(turboItem);
-
-            // Assign to class-level fields
-            if (level.Key == 1) installTurboItem = turboItem;
-            else if (level.Key == 2) removeTurboItem = turboItem;
-        }
-
-        turboSubMenu.Shown += (sender, args) =>
-        {
-            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
-
-            if (vehicle != null && vehicle.Exists())
-            {
-                bool turboEnabled = Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, vehicle, 18);
-
-                if (turboEnabled)
-                {
-                    installTurboItem.Title = "Installed";
-                    removeTurboItem.Title = "Remove Turbo - $500";
-                }
-                else
-                {
-                    installTurboItem.Title = "Install Turbo - $5000";
-                    removeTurboItem.Title = "Removed";
-                }
-            }
-            else
-            {
-                installTurboItem.Title = "Install Turbo - $5000";
-                removeTurboItem.Title = "Remove Turbo - $500";
-            }
-        };
-
-
         // Create headlight submenu
         headlightSubMenu = new NativeMenu(
         "", // Title (empty or optional)
@@ -941,8 +605,8 @@ public class losSantosV2 : Script
         new ScaledTexture(
             PointF.Empty,
             new SizeF(431, 107),
-            "morelossantos", // GTA V workshop banner
-            "shoplogo"
+            "shopui_title_carmod", // GTA V workshop banner
+            "shopui_title_carmod"
         )
         );
         pool.Add(headlightSubMenu);
@@ -1017,7 +681,7 @@ public class losSantosV2 : Script
             "",
             "Neon Kit",
             "",
-            new ScaledTexture(PointF.Empty, new SizeF(431, 107), "morelossantos", "shoplogo")
+            new ScaledTexture(PointF.Empty, new SizeF(431, 107), "shopui_title_carmod", "shopui_title_carmod")
         );
         pool.Add(addNeonSubMenu);
         var addNeonSubMenuItem = upgradeMenu.AddSubMenu(addNeonSubMenu);
@@ -1117,25 +781,349 @@ public class losSantosV2 : Script
         };
 
 
-        // 1. Get current vehicle and available armor levels
-        Vehicle currentVehicle = Game.Player.Character.CurrentVehicle;
-        int availableArmorLevels = 0;
 
-        if (currentVehicle != null && currentVehicle.Exists())
-        {
-            availableArmorLevels = Function.Call<int>(Hash.GET_NUM_VEHICLE_MODS, currentVehicle, 16);
-        }
+        paintSubMenu = new NativeMenu(
+        "",
+        "Paint & Colors",
+        "",
+        new ScaledTexture(
+            PointF.Empty,
+            new SizeF(431, 107),
+            "shopui_title_carmod",
+            "shopui_title_carmod"
+        )
+        );
+        pool.Add(paintSubMenu);
+        var paintSubMenuItem = upgradeMenu.AddSubMenu(paintSubMenu);
 
-        // 2. Create submenu
-        armorSubMenu = new NativeMenu(
+
+        // Primary and Secondary Color Main Submenu
+        NativeMenu primaryColorMenu = new NativeMenu(
             "",
-            "Armour",
+            "Primary Color",
             "",
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            )
+        );
+
+        NativeMenu secondaryColorMenu = new NativeMenu(
+            "",
+            "Secondary Color",
+            "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            )
+        );
+
+        NativeMenu interiorColorMenu = new NativeMenu(
+            "",
+            "Interior Color",
+            "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            )
+        );
+
+        NativeMenu wheelColorMenu = new NativeMenu(
+            "",
+            "Wheel Color",
+            "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            )
+        );
+
+        NativeMenu dialsColorMenu = new NativeMenu(
+            "",
+            "Dials Color",
+            "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            )
+        );
+
+
+        pool.Add(primaryColorMenu);
+        pool.Add(secondaryColorMenu);
+        pool.Add(interiorColorMenu);
+        pool.Add(wheelColorMenu);
+        pool.Add(dialsColorMenu);
+
+        paintSubMenu.AddSubMenu(primaryColorMenu);
+        paintSubMenu.AddSubMenu(secondaryColorMenu);
+        paintSubMenu.AddSubMenu(interiorColorMenu);
+        paintSubMenu.AddSubMenu(wheelColorMenu);
+        paintSubMenu.AddSubMenu(dialsColorMenu);
+
+        // Setup Menus
+        SetupColorCategories(primaryColorMenu, ColorType.Primary);
+        SetupColorCategories(secondaryColorMenu, ColorType.Secondary);
+        SetupColorCategories(interiorColorMenu, ColorType.Interior);
+        SetupColorCategories(wheelColorMenu, ColorType.Wheel);
+        SetupColorCategories(dialsColorMenu, ColorType.Dials);
+
+        // Tint Color Submenu
+        tintColorSubMenu = new NativeMenu("", "Tint Colors", "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            ));
+        pool.Add(tintColorSubMenu);
+        paintSubMenu.AddSubMenu(tintColorSubMenu);
+        tintColorSubMenu.Shown += (sender, args) =>
+        {
+            tintColorSubMenu.Clear();
+
+            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
+            if (vehicle == null || !vehicle.Exists())
+            {
+                GTA.UI.Notification.Show("~r~You must be in a vehicle to view tint colors.");
+                return;
+            }
+
+            for (int i = 0; i < tintlightColors.Count; i++)
+            {
+                int tintIndex = i;
+                string tintName = tintlightColors[i];
+
+                var tintItem = new NativeItem(tintName);
+                tintItem.Activated += (s, e) =>
+                {
+                    Function.Call(Hash.SET_VEHICLE_WINDOW_TINT, vehicle, tintIndex);
+                };
+
+                tintColorSubMenu.Add(tintItem);
+            }
+        };
+
+        // Headlight Color Submenu
+        headlightColorSubMenu = new NativeMenu("", "Xenon Headlight Colors", "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            ));
+        pool.Add(headlightColorSubMenu);
+        paintSubMenu.AddSubMenu(headlightColorSubMenu);
+
+        headlightColorSubMenu.Shown += (sender, args) =>
+        {
+            headlightColorSubMenu.Clear();
+
+            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
+            if (vehicle == null || !vehicle.Exists())
+            {
+                GTA.UI.Notification.Show("~r~You must be in a vehicle to view headlight colors.");
+                return;
+            }
+
+            // Check if Xenon headlights are enabled
+            bool xenonEnabled = Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, vehicle, 22);
+            if (!xenonEnabled)
+            {
+                GTA.UI.Notification.Show("~r~Install Xenon headlights first to use headlight colors!");
+                return;
+            }
+
+            // Load color options
+            for (int i = 0; i < headlightColors.Count; i++)
+            {
+                int colorIndex = i;
+                string colorName = headlightColors[i];
+
+                var headlightItem = new NativeItem(colorName);
+                headlightItem.Activated += (s, e) =>
+                {
+                    Function.Call(Hash.SET_VEHICLE_XENON_LIGHT_COLOR_INDEX, vehicle, colorIndex);
+                };
+
+                headlightColorSubMenu.Add(headlightItem);
+            }
+        };
+
+        // Neon Color Submenu
+        neonColorSubMenu = new NativeMenu("", "Neon Light Color", "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
+            ));
+        pool.Add(neonColorSubMenu);
+        var neonSubMenuItem = paintSubMenu.AddSubMenu(neonColorSubMenu);
+
+        // Define the neon colors (with the colors you want)
+        Color[] colors = new Color[]
+        {
+    Color.AliceBlue, Color.AntiqueWhite, Color.Aqua, Color.Aquamarine, Color.Azure, Color.Beige,
+    Color.Bisque, Color.BlanchedAlmond, Color.Blue, Color.BlueViolet, Color.Brown,
+    Color.BurlyWood, Color.CadetBlue, Color.Chartreuse, Color.Chocolate, Color.Coral, Color.CornflowerBlue,
+    Color.Cornsilk, Color.Crimson, Color.Cyan, Color.DarkBlue, Color.DarkCyan, Color.DarkGoldenrod,
+    Color.DarkGray, Color.DarkGreen, Color.DarkKhaki, Color.DarkMagenta, Color.DarkOliveGreen, Color.DarkOrange,
+    Color.DarkOrchid, Color.DarkRed, Color.DarkSalmon, Color.DarkSeaGreen, Color.DarkSlateBlue, Color.DarkSlateGray,
+    Color.DarkTurquoise, Color.DarkViolet, Color.DeepPink, Color.DeepSkyBlue, Color.DimGray, Color.DodgerBlue,
+    Color.Firebrick, Color.FloralWhite, Color.ForestGreen, Color.Fuchsia, Color.Gainsboro, Color.GhostWhite,
+    Color.Gold, Color.Goldenrod, Color.Gray, Color.Green, Color.GreenYellow, Color.Honeydew, Color.HotPink,
+    Color.IndianRed, Color.Indigo, Color.Ivory, Color.Khaki, Color.Lavender, Color.LavenderBlush, Color.LawnGreen,
+    Color.LemonChiffon, Color.LightBlue, Color.LightCoral, Color.LightCyan, Color.LightGoldenrodYellow, Color.LightGray,
+    Color.LightGreen, Color.LightPink, Color.LightSalmon, Color.LightSeaGreen, Color.LightSkyBlue, Color.LightSlateGray,
+    Color.LightSteelBlue, Color.LightYellow, Color.Lime, Color.LimeGreen, Color.Linen, Color.Magenta, Color.Maroon,
+    Color.MediumAquamarine, Color.MediumBlue, Color.MediumOrchid, Color.MediumPurple, Color.MediumSeaGreen,
+    Color.MediumSlateBlue, Color.MediumSpringGreen, Color.MediumTurquoise, Color.MediumVioletRed, Color.MidnightBlue,
+    Color.MintCream, Color.MistyRose, Color.Moccasin, Color.NavajoWhite, Color.Navy, Color.OldLace, Color.Olive,
+    Color.OliveDrab, Color.Orange, Color.OrangeRed, Color.Orchid, Color.PaleGoldenrod, Color.PaleGreen, Color.PaleTurquoise,
+    Color.PaleVioletRed, Color.PapayaWhip, Color.PeachPuff, Color.Peru, Color.Pink, Color.Plum, Color.PowderBlue,
+    Color.Purple, Color.Red, Color.RosyBrown, Color.RoyalBlue, Color.SaddleBrown, Color.Salmon,
+    Color.SandyBrown, Color.SeaGreen, Color.SeaShell, Color.Sienna, Color.Silver, Color.SkyBlue, Color.SlateBlue,
+    Color.SlateGray, Color.Snow, Color.SpringGreen, Color.SteelBlue, Color.Tan, Color.Teal, Color.Thistle, Color.Tomato,
+    Color.Transparent, Color.Turquoise, Color.Violet, Color.Wheat, Color.White, Color.WhiteSmoke, Color.Yellow,
+    Color.YellowGreen
+        };
+
+        // Show neon color items when opening submenu
+        neonColorSubMenu.Shown += (sender, args) =>
+        {
+            neonColorSubMenu.Clear();
+
+            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
+            if (vehicle == null || !vehicle.Exists())
+            {
+                GTA.UI.Notification.Show("~r~You must be in a vehicle to use neon colors.");
+                return;
+            }
+
+            // Check if neon lights are enabled on at least one side
+            bool hasNeons = false;
+            for (int i = 0; i < 4; i++) // 0 = left, 1 = right, 2 = front, 3 = back
+            {
+                if (Function.Call<bool>(Hash.GET_VEHICLE_NEON_ENABLED, vehicle, i))
+                {
+                    hasNeons = true;
+                    break;
+                }
+            }
+
+            if (!hasNeons)
+            {
+                GTA.UI.Notification.Show("~r~Install and enable neon lights first!");
+                return;
+            }
+
+            // Add items for each defined color
+            for (int i = 0; i < colors.Length; i++)
+            {
+                int colorIndex = i;
+                Color color = colors[i];
+                string colorName = System.Globalization.CultureInfo.InvariantCulture.TextInfo.ToTitleCase(color.Name.Replace('_', ' '));
+
+                var neonItem = new NativeItem(colorName);
+                neonItem.Activated += (s, e) =>
+                {
+                    Function.Call(Hash.SET_VEHICLE_NEON_COLOUR, vehicle, color.R, color.G, color.B);
+                };
+
+                neonColorSubMenu.Add(neonItem);
+            }
+        };
+
+
+
+        turboSubMenu = new NativeMenu(
+            "", // Title (empty or optional)
+            "Turbo", // Subtitle
+            "", // ID or name
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod", // GTA V workshop banner
+                "shopui_title_carmod"
+            )
+        );
+        pool.Add(turboSubMenu);
+        var turboSubMenuItem = upgradeMenu.AddSubMenu(turboSubMenu);
+
+        // Turbo mod options
+        var turboModLevels = new Dictionary<int, string>
+        {
+            { 1, "Install Turbo - 5000$" },
+            { 2, "Remove Turbo - 500$" }
+        };
+
+        // Loop to create the items
+
+
+        foreach (var level in turboModLevels)
+        {
+            var turboItem = new NativeItem(level.Value);
+            turboItem.Activated += (sender, args) => ToggleTurbo(level.Key, turboItem);
+            turboSubMenu.Add(turboItem);
+
+            // Assign to class-level fields
+            if (level.Key == 1) installTurboItem = turboItem;
+            else if (level.Key == 2) removeTurboItem = turboItem;
+        }
+
+        turboSubMenu.Shown += (sender, args) =>
+        {
+            Vehicle vehicle = Game.Player.Character.CurrentVehicle;
+
+            if (vehicle != null && vehicle.Exists())
+            {
+                bool turboEnabled = Function.Call<bool>(Hash.IS_TOGGLE_MOD_ON, vehicle, 18);
+
+                if (turboEnabled)
+                {
+                    installTurboItem.Title = "Installed";
+                    removeTurboItem.Title = "Remove Turbo - $500";
+                }
+                else
+                {
+                    installTurboItem.Title = "Install Turbo - $5000";
+                    removeTurboItem.Title = "Removed";
+                }
+            }
+            else
+            {
+                installTurboItem.Title = "Install Turbo - $5000";
+                removeTurboItem.Title = "Remove Turbo - $500";
+            }
+        };
+
+
+        
+
+        // 1. Get current vehicle and available armor levels
+        Vehicle currentVehicle = Game.Player.Character.CurrentVehicle;
+
+
+        armorSubMenu = new NativeMenu(
+            "",
+            "Armor",
+            "",
+            new ScaledTexture(
+                PointF.Empty,
+                new SizeF(431, 107),
+                "shopui_title_carmod",
+                "shopui_title_carmod"
             )
         );
         pool.Add(armorSubMenu);
@@ -1156,8 +1144,7 @@ public class losSantosV2 : Script
 
         foreach (var level in armorModLevels)
         {
-            if (level.Key <= availableArmorLevels)
-            {
+
                 var armorItem = new NativeItem($"{level.Value} - ${armorPrices[level.Key]}");
                 originalArmorTitles[armorItem] = armorItem.Title;
 
@@ -1178,7 +1165,7 @@ public class losSantosV2 : Script
 
                 armorItems.Add(armorItem);
                 armorSubMenu.Add(armorItem);
-            }
+
         }
 
         // 4. Update UI on menu shown
@@ -1224,8 +1211,8 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
+                "shopui_title_carmod",
+                "shopui_title_carmod"
             )
         );
         pool.Add(engineSubMenu);
@@ -1302,8 +1289,8 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos", // GTA V workshop banner
-                "shoplogo"
+                "shopui_title_carmod", // GTA V workshop banner
+                "shopui_title_carmod"
             )
         );
         pool.Add(transmissionSubMenu);
@@ -1384,8 +1371,8 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos", // GTA V workshop banner
-                "shoplogo"
+                "shopui_title_carmod", // GTA V workshop banner
+                "shopui_title_carmod"
             )
         );
         pool.Add(brakeSubMenu);
@@ -1467,8 +1454,8 @@ public class losSantosV2 : Script
         new ScaledTexture(
             PointF.Empty,
             new SizeF(431, 107),
-            "morelossantos", // GTA V workshop banner
-            "shoplogo"
+            "shopui_title_carmod", // GTA V workshop banner
+            "shopui_title_carmod"
         )
         );
         pool.Add(suspensionSubMenu);
@@ -1527,8 +1514,8 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
+                "shopui_title_carmod",
+                "shopui_title_carmod"
             )
         );
         pool.Add(wheelsSubMenu);
@@ -1563,7 +1550,7 @@ public class losSantosV2 : Script
             int type = category.Key;
             string name = category.Value.Name;
 
-            var categoryMenu = new NativeMenu("", name, "", new ScaledTexture(PointF.Empty, new SizeF(431, 107), "morelossantos", "shoplogo"));
+            var categoryMenu = new NativeMenu("", name, "", new ScaledTexture(PointF.Empty, new SizeF(431, 107), "shopui_title_carmod", "shopui_title_carmod"));
             pool.Add(categoryMenu);
             wheelsSubMenu.AddSubMenu(categoryMenu);
 
@@ -1642,8 +1629,8 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos", // GTA V workshop banner
-                "shoplogo"
+                "shopui_title_carmod", // GTA V workshop banner
+                "shopui_title_carmod"
             )
         );
         pool.Add(otherModsSubMenu);
@@ -1724,7 +1711,7 @@ public class losSantosV2 : Script
     private void OnTick(object sender, EventArgs e)
     {
 
-        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "morelossantos", true);
+        Function.Call(Hash.REQUEST_STREAMED_TEXTURE_DICT, "shopui_title_carmod", true);
         Function.Call<bool>(Hash.HAS_STREAMED_TEXTURE_DICT_LOADED, "morelossantos");
 
 
@@ -1937,30 +1924,6 @@ public class losSantosV2 : Script
 
     //Color Upgrades
 
-    private void ApplyPaintUpgrade(int level)
-    {
-        // Hide all submenus first
-        primaryColorSubMenu.Visible = false;
-        secondaryColorSubMenu.Visible = false;
-        wheelColorSubMenu.Visible = false;
-        interiorColorSubMenu.Visible = false;
-        dialColorSubMenu.Visible = false;
-        neonColorSubMenu.Visible = false;
-        headlightColorSubMenu.Visible = false;
-
-
-        switch (level)
-        {
-
-            case 7:
-                headlightColorSubMenu.Visible = true;
-                break;
-
-        }
-    }
-
-
-
 
     private static int currentColorIndex = 0;  // Track the current index in the color list
     // Enum for Xenon tintlight Colors (Matching with your existing colors)
@@ -2004,9 +1967,6 @@ public class losSantosV2 : Script
 };
     // Function to apply Xenon Headlight color
 
-
-
-
     enum ColorType
     {
         Primary,
@@ -2030,8 +1990,8 @@ public class losSantosV2 : Script
             new ScaledTexture(
                 PointF.Empty,
                 new SizeF(431, 107),
-                "morelossantos",
-                "shoplogo"
+                "shopui_title_carmod",
+                "shopui_title_carmod"
             )
         );
         pool.Add(menu);
@@ -2081,46 +2041,32 @@ public class losSantosV2 : Script
         }
     }
 
-
-
-
     // ==============================
     //    Add Color Items
     // ==============================
 
-    void AddCategoryMenuItems(NativeMenu menu, Dictionary<string, VehicleColorInfo> colorDict, ColorType type)
+    void AddCategoryMenuItems(NativeMenu menu, Dictionary<string, VehicleColors.VehicleColorInfo> colorDict, ColorType type)
     {
         menu.Clear();
+        // Convert the dictionary to a list for index-based access
+        var colorList = colorDict.ToList();
 
-        foreach (var color in colorDict)
+        // Add items and Activated event
+        for (int i = 0; i < colorList.Count; i++)
         {
+            var color = colorList[i];
             var item = new NativeItem(color.Key);
             menu.Add(item);
 
+            // Apply permanently on click
             item.Activated += (sender, e) =>
             {
                 Vehicle veh = Game.Player.Character.CurrentVehicle;
                 if (veh != null && veh.Exists())
                 {
-                    switch (type)
-                    {
-                        case ColorType.Primary:
-                            veh.Mods.PrimaryColor = (VehicleColor)color.Value.Color;
-                            break;
-                        case ColorType.Secondary:
-                            veh.Mods.SecondaryColor = (VehicleColor)color.Value.Color;
-                            break;
-                        case ColorType.Interior:
-                            veh.Mods.TrimColor = (VehicleColor)color.Value.Color;
-                            break;
-                        case ColorType.Wheel:
-                            veh.Mods.RimColor = (VehicleColor)color.Value.Color;
-                            break;
-                        case ColorType.Dials:
-                            veh.Mods.DashboardColor = (VehicleColor)color.Value.Color;
-                            break;
-                    }
+                    ApplyColor(veh, type, color.Value.Color);
 
+                    // Pearlescent special case
                     if (type == ColorType.Primary && colorDict == VehicleColors.PearlescentColors)
                     {
                         SetPearlescentEffect(veh, color.Key);
@@ -2128,8 +2074,47 @@ public class losSantosV2 : Script
                 }
             };
         }
+
+        // Preview on selection change
+        menu.SelectedIndexChanged += (s, e) =>
+        {
+            Vehicle veh = Game.Player.Character.CurrentVehicle;
+            if (veh == null || !veh.Exists()) return;
+            int idx = menu.SelectedIndex;
+            if (idx < 0 || idx >= colorList.Count) return;
+
+            var previewColor = colorList[idx];
+            ApplyColor(veh, type, previewColor.Value.Color);
+
+            // Pearlescent preview
+            if (type == ColorType.Primary && colorDict == VehicleColors.PearlescentColors)
+            {
+                SetPearlescentEffect(veh, previewColor.Key);
+            }
+        };
     }
 
+    void ApplyColor(Vehicle veh, ColorType type, int colorId)
+    {
+        switch (type)
+        {
+            case ColorType.Primary:
+                veh.Mods.PrimaryColor = (VehicleColor)colorId;
+                break;
+            case ColorType.Secondary:
+                veh.Mods.SecondaryColor = (VehicleColor)colorId;
+                break;
+            case ColorType.Interior:
+                veh.Mods.TrimColor = (VehicleColor)colorId;
+                break;
+            case ColorType.Wheel:
+                veh.Mods.RimColor = (VehicleColor)colorId;
+                break;
+            case ColorType.Dials:
+                veh.Mods.DashboardColor = (VehicleColor)colorId;
+                break;
+        }
+    }
     // ==============================
     //    Pearlescent Helper
     // ==============================
@@ -2147,7 +2132,6 @@ public class losSantosV2 : Script
         // Apply only the pearlescent color without touching the base colors
         vehicle.Mods.PearlescentColor = (VehicleColor)pearlescentColorID;
 
-        GTA.UI.Notification.Show($"Applied {pearlescentColor} as Pearlescent Color");
     }
 
 
